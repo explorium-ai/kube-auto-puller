@@ -48,6 +48,8 @@ spec:
             httpGet:
               path: /hooks/status
               port: http
+            failureThreshold: 5
+            timeoutSeconds: 10
           readinessProbe:
             httpGet:
               path: /hooks/status

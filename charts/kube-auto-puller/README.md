@@ -1,6 +1,6 @@
 # Kube-Auto-Puller
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=for-the-badge)
+![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=for-the-badge)
 
 ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=for-the-badge)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/kube-auto-puller)](https://artifacthub.io/packages/search?repo=kube-auto-puller)
