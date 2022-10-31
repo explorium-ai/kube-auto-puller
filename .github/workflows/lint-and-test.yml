@@ -51,13 +51,11 @@ jobs:
           ## If executed with debug this won't work anymore.
           changed=$(ct --config ./.github/configs/ct-lint.yaml list-changed)
           charts=$(echo "$changed" | tr '\n' ' ' | xargs)
-          for chartdir in "${changed[@]}"; do
-            helm dependency update $chartdir
-          done
           if [[ -n "$changed" ]]; then
             echo "::set-output name=changed::true"
             echo "::set-output name=changed_charts::$charts"
           fi
+          helm dependency update charts/kube-auto-puller
 
       - name: Run Artifact Hub lint
         run: |
