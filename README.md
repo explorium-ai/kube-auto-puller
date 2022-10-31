@@ -1,7 +1,6 @@
 # Kube Auto Puller
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/explorium-ai/kube-auto-puller)](https://img.shields.io/github/v/release/explorium-ai/kube-auto-puller)
-
 [![Artifact Hub Explorium](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/kube-auto-puller)](https://artifacthub.io/packages/helm/kube-auto-puller/kube-auto-puller)
 
 **kube-auto-puller** is a kubernetes chart that is an aggregation of *multiple open-source projects*. 
