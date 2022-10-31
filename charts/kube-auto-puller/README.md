@@ -8,7 +8,7 @@
 
 A Kubernetes Image Puller and Cacher with Automatic Discovery
 
-## Usage
+## Install
 
 - Configure general values
     ```yaml
