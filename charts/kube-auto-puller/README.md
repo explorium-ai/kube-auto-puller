@@ -3,7 +3,7 @@
 ![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=for-the-badge)
 
 ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=for-the-badge)
-
+[![Artifact Hub Explorium](https://img.shields.io/endpoint?url=https://artifact-hub.int.explorium.ninja/badge/repository/kube-auto-puller)](https://artifact-hub.int.explorium.ninja/packages/search?repo=kube-auto-puller)
 ## Description
 
 A Kubernetes Image Puller and Cacher with Automatic Discovery
