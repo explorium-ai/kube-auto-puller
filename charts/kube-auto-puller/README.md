@@ -9,7 +9,28 @@
 A Kubernetes Image Puller and Cacher with Automatic Discovery
 
 ## Usage
-WIP
+
+- Configure general values
+    ```yaml
+    global:
+    # -- Defines the secrets which will be used to pull images into nodes and cache them
+    imageCachePullSecrets: []
+   
+    # -- # List of images to exclude when creating image caches. works with Regex
+    exclude:
+        - ".*kube-proxy.*"
+   
+    cacheAllOnDeploy:
+        # -- On Chart install, automatically create all caches for all images in the cluster (respecting excluded list)
+        enabled: true
+    ```
+- Install latest version of kube-auto-puller helm chart
+
+    ```
+    $ helm repo add kube-auto-puller https://explorium-ai.github.io/kube-auto-puller/
+    $ helm repo update
+    $ helm install kube-auto-puller/kube-auto-puller -n kube-system -f values.yaml
+    ```
 
 ## Values
 
