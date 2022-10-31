@@ -1,6 +1,6 @@
 repos:
-  - repo: https://github.com/dirien/minecraft-prometheus-exporter
-    rev: v0.10.0
+  - repo: https://github.com/explorium-ai/kube-auto-puller.git
+    rev: 1.0.0-helm
     hooks:
       - id: helm-docs
         args:
