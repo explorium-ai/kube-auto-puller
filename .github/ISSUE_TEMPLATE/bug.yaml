@@ -22,14 +22,6 @@ body:
       description: Please share as much information as possible. Logs, screenshots, etc.
     validations:
       required: true
-  - type: textarea
-    id: kube-auto-puller-version
-    attributes:
-      label: kube-auto-puller --version
-      description: '`kube-auto-puller --version` output'
-      render: bash
-    validations:
-      required: true
   - type: checkboxes
     id: search
     attributes:
