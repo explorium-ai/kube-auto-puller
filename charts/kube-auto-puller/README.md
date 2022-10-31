@@ -83,7 +83,7 @@ A Kubernetes Image Puller and Cacher with Automatic Discovery
 | webhook-receiver.nodeSelector | object | `{}` | Set the node selector for the pod. |
 | webhook-receiver.podSecurityContext | object | `{}` |  |
 | webhook-receiver.replicaCount | int | `2` | Numbers of replicas |
-| webhook-receiver.resources | object | `{"limits":{"cpu":"500m","memory":"5123Mi"},"requests":{"cpu":"100m","memory":"128Mi"}}` | Set the resources requests and limits |
+| webhook-receiver.resources | object | `{}` | Set the resources requests and limits |
 | webhook-receiver.securityContext | object | `{}` |  |
 | webhook-receiver.service.port | int | `9000` | Default Service port |
 | webhook-receiver.service.type | string | `"ClusterIP"` | Specifies what type of Service should be created |

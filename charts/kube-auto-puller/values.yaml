@@ -141,7 +141,7 @@ webhook-receiver:
     #      - chart-example.local
 
   # -- Set the resources requests and limits
-  resources:
+  resources: {}
     # yamllint disable-line rule:line-length
     # We usually recommend not to specify default resources and to leave this as a conscious
     # yamllint disable-line rule:line-length
@@ -150,12 +150,12 @@ webhook-receiver:
     # resources, such as Minikube. If you do want to specify resources, uncomment the following
     # yamllint disable-line rule:line-length
     # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-    limits:
-      cpu: 500m
-      memory: 5123Mi
-    requests:
-      cpu: 100m
-      memory: 128Mi
+    # limits:
+    #   cpu: 500m
+    #   memory: 5123Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
 
   # -- Set the node selector for the pod.
   nodeSelector: {}
