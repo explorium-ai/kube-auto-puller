@@ -2,6 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+---
 replicaCount: 1
 
 image:
@@ -18,15 +19,16 @@ serviceAccount:
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
+  # yamllint disable-line rule:line-length
   # If not set and create is true, a name is generated using the fullname template
   name: webhook-receiver
 
 podSecurityContext: {}
-  # fsGroup: 2000
+# fsGroup: 2000
 
 securityContext: {}
-  # capabilities:
-  #   drop:
+# capabilities:
+#   drop:
   #   - ALL
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
@@ -39,8 +41,8 @@ service:
 ingress:
   enabled: true
   annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  # kubernetes.io/ingress.class: nginx
+  # kubernetes.io/tls-acme: "true"
   hosts:
     - host: webhook-receiver.chart.local
       paths:
@@ -51,9 +53,13 @@ ingress:
   #      - chart-example.local
 
 resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
+# yamllint disable-line rule:line-length
+# We usually recommend not to specify default resources and to leave this as a conscious
+# yamllint disable-line rule:line-length
   # choice for the user. This also increases chances charts run on environments with little
+  # yamllint disable-line rule:line-length
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # yamllint disable-line rule:line-length
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   # limits:
   #   cpu: 100m
@@ -96,7 +102,7 @@ hooks:
           {{- range . }}
           {{ . | quote }}
           {{- end }}
-        {{- end }}  
+        {{- end }}
         )
         exclude=false
         for regex in "${excluded_images[@]}"; do
@@ -114,7 +120,7 @@ hooks:
           name: $(echo -n $name)
           labels:
             app: kubefledged
-            kubefledged: imagecache            
+            kubefledged: imagecache
         spec:
           cacheSpec:
           - images:
@@ -122,7 +128,7 @@ hooks:
           {{- with .Values.global.imageCachePullSecrets }}
           imagePullSecrets:
           {{- toYaml . | nindent 4 }}
-          {{- end }}    
+          {{- end }}
         EOF
         fi
     hook:
@@ -130,15 +136,19 @@ hooks:
       execute-command: /data/cache.sh
       incoming-payload-content-type: application/json
       pass-arguments-to-command:
-      - source: payload
-        name: EventMessage
+        - source: payload
+          name: EventMessage
   remover:
     enable: true
     files:
       /data/delete.sh: |
         #!/bin/bash
+        # yamllint disable-line rule:line-length
+        # yamllint disable-line rule:line-length
         hashed_cached_images=$(kubectl get imagecaches -A -o=custom-columns='DATA:metadata.name' | awk '!seen[$0]++')
         hashed_cached_images=${hashed_cached_images#*$'\n'}
+        # yamllint disable-line rule:line-length
+        # yamllint disable-line rule:line-length
         relevant_images=$(kubectl get pods -A -o=custom-columns='DATA:spec.containers[*].image' | tr ',' '\n' | awk '!seen[$0]++')
         relevant_images=${relevant_images#*$'\n'}
         SAVEIFS=$IFS
@@ -147,6 +157,8 @@ hooks:
         hashed_cached_images=($hashed_cached_images)
         IFS=$SAVEIFS
         for i in "${!relevant_images[@]}"; do
+          # yamllint disable-line rule:line-length
+          # yamllint disable-line rule:line-length
           relevant_images[$i]=$(echo ${relevant_images[$i]} | cut -d "/" -f2 | sed "s/[^[:alnum:]-]//g")
         done
         echo ${relevant_images[@]}
@@ -154,19 +166,31 @@ hooks:
         do
         echo "Checking image $i"
         if [[ ! " ${relevant_images[*]} " =~ " ${i} " ]]; then
+          # yamllint disable-line rule:line-length
+          # yamllint disable-line rule:line-length
           image=$(kubectl get imagecaches $i -o=custom-columns='DATA:spec.cacheSpec[0].images[0]')
           image=${image#*$'\n'}
           echo $image is no longer in the cluster. purging cache...
+          # yamllint disable-line rule:line-length
+          # yamllint disable-line rule:line-length
           kubectl annotate --overwrite imagecaches $i kubefledged.io/purge-imagecache=
           sleep 1
+          # yamllint disable-line rule:line-length
+          # yamllint disable-line rule:line-length
           status=$(kubectl get imagecaches $i -o json | jq .status.status | xargs)
+          # yamllint disable-line rule:line-length
+          # yamllint disable-line rule:line-length
           message=$(kubectl get imagecaches $i -o json | jq .status.message | xargs)
           until [ $status != "Processing" ]
           do
               echo Status: $status
               echo Status: $message
+              # yamllint disable-line rule:line-length
+              # yamllint disable-line rule:line-length
               status=$(kubectl get imagecaches $i -o json | jq .status.status | xargs)
               message=$(kubectl get imagecaches $i -o json | jq .status.message)
+              # yamllint disable-line rule:line-length
+              # yamllint disable-line rule:line-length
               kubectl annotate --overwrite imagecaches $i kubefledged.io/purge-imagecache=
           done
           kubectl delete imagecaches $i
@@ -178,4 +202,3 @@ hooks:
       id: remover
       execute-command: /data/delete.sh
       incoming-payload-content-type: application/json
-      

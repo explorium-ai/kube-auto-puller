@@ -1,29 +1,31 @@
+---
 # Default values for kube-auto-puller.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
 # -- String to override the default generated name
-nameOverride: ""
+nameOverride: ''
 
 # -- String to override the default generated fullname
-fullnameOverride: ""
+fullnameOverride: ''
 
 global:
+  # yamllint disable-line rule:line-length
   # -- Defines the secrets which will be used to pull images into nodes and cache them
   imageCachePullSecrets: []
-  
-  # -- # List of images to exclude when creating image caches. works with Regex
+  # yamllint disable-line rule:line-length
+  # --  # List of images to exclude when creating image caches. works with Regex
   exclude:
-    - ".*kube-proxy.*"
-  
-  cacheAllOnDeploy: 
+    - .*kube-proxy.*
+  cacheAllOnDeploy:
+    # yamllint disable-line rule:line-length
     # -- On Chart install, automatically create all caches for all images in the cluster
     enabled: true
     image:
       # -- The docker image repository to use
       repository: bitnami/kubectl
       # -- The docker image tag to use
-      tag: "1.25.3"
+      tag: 1.25.3
       # -- The docker image pull policy
       pullPolicy: IfNotPresent
 
@@ -42,16 +44,20 @@ exporter:
 
   # -- Set the resources requests and limits
   resources:
+    # yamllint disable-line rule:line-length
     # We usually recommend not to specify default resources and to leave this as a conscious
+    # yamllint disable-line rule:line-length
     # choice for the user. This also increases chances charts run on environments with little
+    # yamllint disable-line rule:line-length
     # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # yamllint disable-line rule:line-length
     # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
     requests:
       cpu: 100m
       memory: 100Mi
     limits:
       cpu: 500m
-      memory: 250Mi  
+      memory: 250Mi
 
   # -- Set the node selector for the pod.
   nodeSelector: {}
@@ -61,13 +67,13 @@ exporter:
 
   # -- Set the affinity for the pod.
   affinity: {}
-    
 # https://github.com/senthilrch/kube-fledged/tree/master/deploy/kubefledged-operator/helm-charts/kubefledged
 kube-fledged:
   args:
     # -- Time to refresh image caching
     controllerImageCacheRefreshFrequency: 1m
   webhookServer:
+    # yamllint disable-line rule:line-length
     # -- Enabled a webhook server. (WARNING: Enabling breaks the chart. Validating webhook will invalidate certificates)
     enable: false
 
@@ -86,25 +92,26 @@ webhook-receiver:
   imagePullSecrets: []
 
   # -- String to override the default generated name
-  nameOverride: ""
+  nameOverride: ''
 
   # -- String to override the default generated fullname
-  fullnameOverride: ""
+  fullnameOverride: ''
 
   serviceAccount:
     # -- Additional annotations
     annotations: {}
     # -- The name of the ServiceAccount to use.
+    # yamllint disable-line rule:line-length
     # If not set and create is true, a name is generated using the fullname template
     name: webhook-receiver
 
   podSecurityContext: {}
-    # fsGroup: 2000
+  # fsGroup: 2000
 
   securityContext: {}
-    # capabilities:
-    #   drop:
-    #   - ALL
+  # capabilities:
+  #   drop:
+  #   - ALL
     # readOnlyRootFilesystem: true
     # runAsNonRoot: true
     # runAsUser: 1000
@@ -120,8 +127,8 @@ webhook-receiver:
     enabled: false
     # -- Additional annotations
     annotations: {}
-      # kubernetes.io/ingress.class: nginx
-      # kubernetes.io/tls-acme: "true"
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
     # -- Ingress host
     hosts:
       - host: webhook-receiver.chart.local
@@ -135,9 +142,13 @@ webhook-receiver:
 
   # -- Set the resources requests and limits
   resources:
+    # yamllint disable-line rule:line-length
     # We usually recommend not to specify default resources and to leave this as a conscious
+    # yamllint disable-line rule:line-length
     # choice for the user. This also increases chances charts run on environments with little
+    # yamllint disable-line rule:line-length
     # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # yamllint disable-line rule:line-length
     # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
     limits:
       cpu: 500m
@@ -160,6 +171,7 @@ webhook-receiver:
 
 # https://github.com/bhuwanupadhyay/helm-charts/tree/main/charts/ecr-creds
 ecr-creds:
+  # yamllint disable-line rule:line-length
   # -- Creates an automatic ECR renew sub-chart for creating an ECR authenticating secret in the namespace.
   enabled: false
 
@@ -167,18 +179,18 @@ ecr-creds:
     # -- The docker image repository to use
     repository: docker.io/bhuwanupadhyay/ecr-creds
     # -- The docker image tag to use
-    tag: ""
+    tag: ''
     # -- The docker image pull policy
-    pullPolicy: IfNotPresent    
+    pullPolicy: IfNotPresent
 
   # -- Image Pull Secrets
   imagePullSecrets: []
 
   # -- String to override the default generated name
-  nameOverride: ""
+  nameOverride: ''
 
   # -- String to override the default generated fullname
-  fullnameOverride: ""
+  fullnameOverride: ''
 
   serviceAccount:
     # -- Additional annotations
@@ -186,19 +198,22 @@ ecr-creds:
     # -- Specifies whether a ServiceAccount should be created
     create: true
     # -- The name of the ServiceAccount to use.
+    # yamllint disable-line rule:line-length
     # If not set and create is true, a name is generated using the fullname template
-    name: ""
+    name: ''
 
+  # yamllint disable-line rule:line-length
   # -- The name of the ECR creds secret to create. Make use to reference it in the chart.
   targetPullSecretName: aws-ecr-creds
-  
+
   aws:
     # -- AWS Account ID
-    account: ""
+    account: ''
     # -- AWS Account Region
-    region: ""
+    region: ''
     credentials:
       # -- (Optional if service account with role exists) AWS Account Access Key
-      accessKey: ""
+      accessKey: ''
+      # yamllint disable-line rule:line-length
       # -- (Optional if service account with role exists) AWS Account Access Key ID
-      secretKey: ""
+      secretKey: ''

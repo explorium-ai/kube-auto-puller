@@ -1,40 +1,65 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    name: {{ include "image-puller.fullname" . | trunc 50 | trimSuffix "-" }}-kube-eventer
-    {{- include "image-puller.labels" . | nindent 4 }}    
+    name: {{include "image-puller.fullname" . | trunc 50 | trimSuffix "-"}}-kube-eventer
+    {{- include "image-puller.labels" . | nindent 4 }}
+  # yamllint disable-line rule:line-length
+  # yamllint disable-line rule:line-length
+  # yamllint disable-line rule:line-length
   name: {{ include "image-puller.fullname" . | trunc 50 | trimSuffix "-" }}-kube-eventer
 spec:
   replicas: 1
   selector:
     matchLabels:
+      # yamllint disable-line rule:line-length
+      # yamllint disable-line rule:line-length
+      # yamllint disable-line rule:line-length
       app: {{ include "image-puller.fullname" . | trunc 50 | trimSuffix "-" }}-kube-eventer
   template:
     metadata:
       labels:
+        # yamllint disable-line rule:line-length
+        # yamllint disable-line rule:line-length
+        # yamllint disable-line rule:line-length
         app: {{ include "image-puller.fullname" . | trunc 50 | trimSuffix "-" }}-kube-eventer
         {{- include "image-puller.selectorLabelsExporter" . | nindent 8 }}
-      annotations:	
+      annotations:
         scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
+      # yamllint disable-line rule:line-length
+      # yamllint disable-line rule:line-length
+      # yamllint disable-line rule:line-length
       serviceAccount: {{ include "image-puller.fullname" . | trunc 50 | trimSuffix "-" }}-kube-eventer
       {{- with .Values.exporter.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
-      {{- end }}      
+      {{- end }}
       containers:
+        # yamllint disable-line rule:line-length
+        # yamllint disable-line rule:line-length
+        # yamllint disable-line rule:line-length
         - image: "{{ .Values.exporter.image.repository }}:{{ .Values.exporter.image.tag }}"
+          # yamllint disable-line rule:line-length
+          # yamllint disable-line rule:line-length
+          # yamllint disable-line rule:line-length
           name: {{ include "image-puller.fullname" . | trunc 50 | trimSuffix "-" }}-kube-eventer
           command:
             - "/kube-eventer"
             - "--source=kubernetes:https://kubernetes.default"
+            # yamllint disable-line rule:line-length
+            # yamllint disable-line rule:line-length
+            # yamllint disable-line rule:line-length
             - "--sink=webhook:http://{{.Release.Name}}-webhook-receiver:{{ index .Values "webhook-receiver" "service" "port" }}/hooks/puller?level=Normal&kinds=Pod&reason=Pulled&header=Content-Type=application/json&method=POST"
+            # yamllint disable-line rule:line-length
+            # yamllint disable-line rule:line-length
+            # yamllint disable-line rule:line-length
             - "--sink=webhook:http://{{.Release.Name}}-webhook-receiver:{{ index .Values "webhook-receiver" "service" "port" }}/hooks/remover?level=Normal&kinds=Pod&reason=Killing&header=Content-Type=application/json&method=POST"
           {{- with .Values.exporter.resources }}
           resources:
-            {{- toYaml . | nindent 12 }}  
-          {{- end }}    
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
       {{- with .Values.exporter.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -52,6 +77,9 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
+  # yamllint disable-line rule:line-length
+  # yamllint disable-line rule:line-length
+  # yamllint disable-line rule:line-length
   name: {{ include "image-puller.fullname" . | trunc 50 | trimSuffix "-" }}-kube-eventer
 rules:
   - apiGroups:
@@ -67,17 +95,29 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
+  # yamllint disable-line rule:line-length
+  # yamllint disable-line rule:line-length
+  # yamllint disable-line rule:line-length
   name: {{ include "image-puller.fullname" . | trunc 50 | trimSuffix "-" }}-kube-eventer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
+  # yamllint disable-line rule:line-length
+  # yamllint disable-line rule:line-length
+  # yamllint disable-line rule:line-length
   name: {{ include "image-puller.fullname" . | trunc 50 | trimSuffix "-" }}-kube-eventer
 subjects:
   - kind: ServiceAccount
+    # yamllint disable-line rule:line-length
+    # yamllint disable-line rule:line-length
+    # yamllint disable-line rule:line-length
     name: {{ include "image-puller.fullname" . | trunc 50 | trimSuffix "-" }}-kube-eventer
     namespace: {{.Release.Namespace}}
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
+  # yamllint disable-line rule:line-length
+  # yamllint disable-line rule:line-length
+  # yamllint disable-line rule:line-length
   name: {{ include "image-puller.fullname" . | trunc 50 | trimSuffix "-" }}-kube-eventer

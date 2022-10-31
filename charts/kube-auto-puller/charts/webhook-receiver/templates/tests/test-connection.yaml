@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: Pod
 metadata:
@@ -11,5 +12,6 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
+      # yamllint disable-line rule:line-length
       args: ['{{ include "webhook-receiver.fullname" . }}:{{ .Values.service.port }}/hooks/status']
   restartPolicy: Never
