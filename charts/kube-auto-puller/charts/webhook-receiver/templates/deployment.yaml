@@ -1,28 +1,30 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "webhook-receiver.fullname" . }}
+  name: {{include "webhook-receiver.fullname" .}}
   labels:
     {{- include "webhook-receiver.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{.Values.replicaCount}}
   selector:
     matchLabels:
-      {{- include "webhook-receiver.selectorLabels" . | nindent 6 }}
+      {{- include "webhook-receiver.selectorLabels" . | nindent 6}}
   template:
     metadata:
       labels:
-        {{- include "webhook-receiver.selectorLabels" . | nindent 8 }}
+        {{- include "webhook-receiver.selectorLabels" . | nindent 8}}
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}            
+        # yamllint disable-line rule:line-length
+        checksum/config: {{include (print $.Template.BasePath "/configmap.yaml") . | sha256sum}}
     spec:
-      serviceAccountName: {{ include "webhook-receiver.serviceAccountName" . }}
+      serviceAccountName: {{include "webhook-receiver.serviceAccountName" .}}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
-      {{- end }}      
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           args:
@@ -33,6 +35,8 @@ spec:
             - -template
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
+          # yamllint disable-line rule:line-length
+          # yamllint disable-line rule:line-length
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
@@ -48,6 +52,8 @@ spec:
             httpGet:
               path: /hooks/status
               port: http
+            failureThreshold: 5
+            timeoutSeconds: 10
           readinessProbe:
             httpGet:
               path: /hooks/status

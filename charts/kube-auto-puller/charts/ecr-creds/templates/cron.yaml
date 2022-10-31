@@ -1,11 +1,12 @@
+---
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ include "ecr-creds.fullname" . }}
+  name: {{include "ecr-creds.fullname" .}}
   labels:
     {{- include "ecr-creds.labels" . | nindent 4 }}
   annotations:
-    helm.sh/hook-delete-policy: before-hook-creation    
+    helm.sh/hook-delete-policy: before-hook-creation
 spec:
   schedule: '* */6 * * *'
   successfulJobsHistoryLimit: 1
@@ -16,9 +17,9 @@ spec:
       template:
         metadata:
           labels:
-            {{- include "ecr-creds.selectorLabels" . | nindent 12 }}
+            {{- include "ecr-creds.selectorLabels" . | nindent 12}}
         spec:
-          serviceAccountName: {{ include "ecr-creds.serviceAccountName" . }}
+          serviceAccountName: {{include "ecr-creds.serviceAccountName" .}}
           restartPolicy: Never
           {{- with .Values.imagePullSecrets }}
           imagePullSecrets:
@@ -26,6 +27,8 @@ spec:
           {{- end }}
           containers:
           - name: kubectl
+            # yamllint disable-line rule:line-length
+            # yamllint disable-line rule:line-length
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
             imagePullPolicy: {{ .Values.image.pullPolicy }}
             {{- if eq (include "ecr-creds.createSecret" .) "true" -}}
@@ -54,12 +57,18 @@ spec:
 
               DOCKER_REGISTRY_SERVER=https://${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
               DOCKER_USER=AWS
+              # yamllint disable-line rule:line-length
+              # yamllint disable-line rule:line-length
               DOCKER_PASSWORD=`aws ecr get-login --region ${AWS_REGION} --registry-ids ${AWS_ACCOUNT} | cut -d' ' -f6`
 
               echo "DOCKER_REGISTRY_SERVER=$DOCKER_REGISTRY_SERVER"
               echo "DOCKER_USER=$DOCKER_USER"
 
+              # yamllint disable-line rule:line-length
+              # yamllint disable-line rule:line-length
               kubectl delete secret --namespace {{ .Release.Namespace }} $PULL_SECRET_NAME || true
+              # yamllint disable-line rule:line-length
+              # yamllint disable-line rule:line-length
               kubectl create secret --namespace {{ .Release.Namespace }} docker-registry $PULL_SECRET_NAME \
               --docker-server=$DOCKER_REGISTRY_SERVER \
               --docker-username=$DOCKER_USER \

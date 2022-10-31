@@ -1,6 +1,6 @@
 # Kube-Auto-Puller
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=for-the-badge)
+![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=for-the-badge)
 
 ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=for-the-badge)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/kube-auto-puller)](https://artifacthub.io/packages/search?repo=kube-auto-puller)
@@ -49,7 +49,7 @@ A Kubernetes Image Puller and Cacher with Automatic Discovery
 | ecr-creds.nameOverride | string | `""` | String to override the default generated name |
 | ecr-creds.serviceAccount.annotations | object | `{}` | Additional annotations |
 | ecr-creds.serviceAccount.create | bool | `true` | Specifies whether a ServiceAccount should be created |
-| ecr-creds.serviceAccount.name | string | `""` | The name of the ServiceAccount to use. If not set and create is true, a name is generated using the fullname template |
+| ecr-creds.serviceAccount.name | string | `""` | The name of the ServiceAccount to use. yamllint disable-line rule:line-length If not set and create is true, a name is generated using the fullname template |
 | ecr-creds.targetPullSecretName | string | `"aws-ecr-creds"` | The name of the ECR creds secret to create. Make use to reference it in the chart. |
 | exporter.affinity | object | `{}` | Set the affinity for the pod. |
 | exporter.image.pullPolicy | string | `"IfNotPresent"` | The docker image pull policy |
@@ -88,7 +88,7 @@ A Kubernetes Image Puller and Cacher with Automatic Discovery
 | webhook-receiver.service.port | int | `9000` | Default Service port |
 | webhook-receiver.service.type | string | `"ClusterIP"` | Specifies what type of Service should be created |
 | webhook-receiver.serviceAccount.annotations | object | `{}` | Additional annotations |
-| webhook-receiver.serviceAccount.name | string | `"webhook-receiver"` | The name of the ServiceAccount to use. If not set and create is true, a name is generated using the fullname template |
+| webhook-receiver.serviceAccount.name | string | `"webhook-receiver"` | The name of the ServiceAccount to use. yamllint disable-line rule:line-length If not set and create is true, a name is generated using the fullname template |
 | webhook-receiver.tolerations | list | `[]` | Set the tolerations for the pod. |
 
 **Homepage:** <https://github.com/explorium-ai/kube-auto-puller>

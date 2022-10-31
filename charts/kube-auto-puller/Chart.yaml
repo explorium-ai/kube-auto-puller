@@ -1,4 +1,4 @@
-
+---
 home: https://github.com/explorium-ai/kube-auto-puller
 keywords:
   - kube-fledged
@@ -22,11 +22,9 @@ dependencies:
     repository: https://senthilrch.github.io/kubefledged-charts/
     version: v0.10.0
   - name: webhook-receiver
-    repository: file://charts/webhook-receiver
     version: 1.0.9
   - name: ecr-creds
-    repository: file://charts/ecr-creds
     version: 0.0.1
     condition: ecr-creds.enabled
 name: kube-auto-puller
-version: 1.0.0
+version: 1.0.1

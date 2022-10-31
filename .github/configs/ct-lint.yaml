@@ -6,9 +6,10 @@ target-branch: main
 chart-dirs:
   - charts
 helm-extra-args: "--timeout 600s"
+helm-dependency-extra-args: "--debug"
 validate-chart-schema: true
 validate-chart-values: true
 validate-maintainers: true
 validate-yaml: true
-exclude-deprecated: true
+exclude-deprecated: false
 excluded-charts: []

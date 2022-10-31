@@ -25,25 +25,25 @@ jobs:
         with:
           python-version: 3.7
 
-      - name: Run Trivy vulnerability scanner in IaC mode
-        uses: aquasecurity/trivy-action@d63413b0a4a4482237085319f7f4a1ce99a8f2ac # tag=0.7.1
-        with:
-          scan-type: 'config'
-          hide-progress: false
-          format: 'sarif'
-          scan-ref: 'charts/kube-auto-puller'
-          output: 'trivy-results.sarif'
-          exit-code: '1'
-          ignore-unfixed: true
+      # - name: Run Trivy vulnerability scanner in IaC mode
+      #   uses: aquasecurity/trivy-action@d63413b0a4a4482237085319f7f4a1ce99a8f2ac # tag=0.7.1
+      #   with:
+      #     scan-type: 'config'
+      #     hide-progress: false
+      #     format: 'sarif'
+      #     scan-ref: 'charts/kube-auto-puller'
+      #     output: 'trivy-results.sarif'
+      #     exit-code: '1'
+      #     ignore-unfixed: true
 
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@ec3cf9c605b848da5f1e41e8452719eb1ccfb9a6 # tag=v2.1.29
-        with:
-          sarif_file: 'trivy-results.sarif'
+      # - name: Upload Trivy scan results to GitHub Security tab
+      #   uses: github/codeql-action/upload-sarif@ec3cf9c605b848da5f1e41e8452719eb1ccfb9a6 # tag=v2.1.29
+      #   with:
+      #     sarif_file: 'trivy-results.sarif'
 
       - name: Setup Chart Linting
         id: lint
-        uses: helm/chart-testing-action@afea100a513515fbd68b0e72a7bb0ae34cb62aec # tag=v2.3.1
+        uses: helm/chart-testing-action@v2.3.1 # tag=v2.3.1
 
       - name: List changed charts
         id: list-changed
@@ -68,6 +68,9 @@ jobs:
       - name: Create kind cluster
         uses: helm/kind-action@9e8295d178de23cbfbd8fa16cf844eec1d773a07 # tag=v1.4.0
         if: steps.list-changed.outputs.changed == 'true'
+
+      - name: Repo Add
+        run: helm repo add kube-fledged https://senthilrch.github.io/kubefledged-charts/
 
       - name: Run chart-testing (install)
         run: ct install --config ./.github/configs/ct-lint.yaml

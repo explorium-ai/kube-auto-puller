@@ -1,15 +1,16 @@
+---
 {{- if .Values.global.cacheAllOnDeploy.enabled -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "webhook-receiver.fullname" . }}-auto-cacher
+  name: {{ include "webhook-receiver.fullname" .}}-auto-cacher
   labels:
-    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
-    app.kubernetes.io/instance: {{ .Release.Name | quote }}
-    app.kubernetes.io/version: {{ .Chart.AppVersion }}
-    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"  
+    app.kubernetes.io/managed-by: {{.Release.Service | quote}}
+    app.kubernetes.io/instance: {{.Release.Name | quote}}
+    app.kubernetes.io/version: {{.Chart.AppVersion}}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
   labels:
-    {{- include "webhook-receiver.labels" . | nindent 4 }}
+    {{- include "webhook-receiver.labels" . | nindent 4}}
   annotations:
     helm.sh/hook-delete-policy: before-hook-creation
     # This is what defines this resource as a hook. Without this line, the
@@ -19,15 +20,15 @@ spec:
   backoffLimit: 2
   template:
     metadata:
-      name: {{ include "webhook-receiver.fullname" . }}-auto-cacher
+      name: {{include "webhook-receiver.fullname" .}}-auto-cacher
       labels:
-        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
-        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        app.kubernetes.io/managed-by: {{.Release.Service | quote}}
+        app.kubernetes.io/instance: {{.Release.Name | quote}}
         helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
       labels:
-        {{- include "webhook-receiver.selectorLabelsCacher" . | nindent 8 }}
+        {{- include "webhook-receiver.selectorLabelsCacher" . | nindent 8}}
     spec:
-      serviceAccountName: {{ include "webhook-receiver.serviceAccountName" . }}
+      serviceAccountName: {{include "webhook-receiver.serviceAccountName" .}}
       restartPolicy: Never
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -35,6 +36,8 @@ spec:
       {{- end }}
       containers:
       - name: kubectl
+        # yamllint disable-line rule:line-length
+        # yamllint disable-line rule:line-length
         image: "{{ .Values.global.cacheAllOnDeploy.image.repository }}:{{ .Values.global.cacheAllOnDeploy.image.tag }}"
         imagePullPolicy: {{ .Values.global.cacheAllOnDeploy.image.pullPolicy }}
         command:
@@ -42,6 +45,8 @@ spec:
         - "-c"
         - |
           #!/bin/bash
+          # yamllint disable-line rule:line-length
+          # yamllint disable-line rule:line-length
           relevant_images=$(kubectl get pods -A -o=custom-columns='DATA:spec.containers[*].image' | tr ',' '\n' | awk '!seen[$0]++')
           relevant_images=${relevant_images#*$'\n'}
           SAVEIFS=$IFS
@@ -54,7 +59,7 @@ spec:
             {{- range . }}
             {{ . | quote }}
             {{- end }}
-          {{- end }}  
+          {{- end }}
           )
           echo "Excluded Images: ${excluded_images[@]}"
           for i in "${relevant_images[@]}"
@@ -77,7 +82,7 @@ spec:
             name: $(echo -n $name)
             labels:
               app: kubefledged
-              kubefledged: imagecache            
+              kubefledged: imagecache
           spec:
             cacheSpec:
             - images:
@@ -85,7 +90,7 @@ spec:
             {{- with .Values.global.imageCachePullSecrets }}
             imagePullSecrets:
             {{- toYaml . | nindent 14 }}
-            {{- end }}        
+            {{- end }}
           EOF
           fi
           done
