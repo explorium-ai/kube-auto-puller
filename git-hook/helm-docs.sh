@@ -8,3 +8,5 @@ if ! command -v helm-docs > /dev/null 2>&1; then
 fi
 
 helm-docs "${@}"
+
+git add charts/kube-auto-puller/README.md
