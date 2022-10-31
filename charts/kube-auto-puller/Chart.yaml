@@ -1,3 +1,13 @@
+
+home: https://github.com/explorium-ai/kube-auto-puller
+keywords:
+  - kube-fledged
+  - image
+  - kubernetes
+  - cache
+  - pull
+sources:
+  - https://github.com/explorium-ai/kube-auto-puller
 annotations:
   category: Kubernetes
 apiVersion: v2
@@ -6,6 +16,7 @@ description: A Kubernetes Image Puller and Cacher with Automatic Discovery
 maintainers:
   - email: devops@explorium.ai
     name: explorium-ai
+    url: https://www.explorium.ai/
 dependencies:
   - name: kube-fledged
     repository: https://senthilrch.github.io/kubefledged-charts/
