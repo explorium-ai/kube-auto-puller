@@ -1,0 +1,65 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "ecr-creds.fullname" . }}
+  labels:
+    {{- include "ecr-creds.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook-delete-policy: before-hook-creation    
+spec:
+  backoffLimit: 2
+  template:
+    metadata:
+      labels:
+        {{- include "ecr-creds.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "ecr-creds.serviceAccountName" . }}
+      terminationGracePeriodSeconds: 0
+      restartPolicy: Never
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: kubectl
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- if eq (include "ecr-creds.createSecret" .) "true" -}}
+        env:
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "ecr-creds.fullname" . }}
+                key: AWS_ACCESS_KEY_ID
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "ecr-creds.fullname" . }}
+                key: AWS_SECRET_ACCESS_KEY
+        {{- end }}
+        command:
+        - "/bin/sh"
+        - "-c"
+        - |
+          AWS_ACCOUNT={{ .Values.aws.account }}
+          AWS_REGION={{ .Values.aws.region }}
+          PULL_SECRET_NAME={{ .Values.targetPullSecretName }}
+          echo "AWS_ACCOUNT=$AWS_ACCOUNT"
+          echo "AWS_REGION=$AWS_REGION"
+          echo "PULL_SECRET_NAME=$PULL_SECRET_NAME"
+
+          DOCKER_REGISTRY_SERVER=https://${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
+          DOCKER_USER=AWS
+          DOCKER_PASSWORD=`aws ecr get-login --region ${AWS_REGION} --registry-ids ${AWS_ACCOUNT} | cut -d' ' -f6`
+
+          echo "DOCKER_REGISTRY_SERVER=$DOCKER_REGISTRY_SERVER"
+          echo "DOCKER_USER=$DOCKER_USER"
+
+          kubectl delete secret --namespace {{ .Release.Namespace }} $PULL_SECRET_NAME || true
+          kubectl create secret --namespace {{ .Release.Namespace }} docker-registry $PULL_SECRET_NAME \
+          --docker-server=$DOCKER_REGISTRY_SERVER \
+          --docker-username=$DOCKER_USER \
+          --docker-password=$DOCKER_PASSWORD \
+          --docker-email=no@email.local
+
+          # kubectl patch serviceaccount default -p '{"imagePullSecrets":[{"name":"$PULL_SECRET_NAME"}]}'

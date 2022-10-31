@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name: {{ include "image-puller.fullname" . | trunc 50 | trimSuffix "-" }}-kube-eventer
+    {{- include "image-puller.labels" . | nindent 4 }}    
+  name: {{ include "image-puller.fullname" . | trunc 50 | trimSuffix "-" }}-kube-eventer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "image-puller.fullname" . | trunc 50 | trimSuffix "-" }}-kube-eventer
+  template:
+    metadata:
+      labels:
+        app: {{ include "image-puller.fullname" . | trunc 50 | trimSuffix "-" }}-kube-eventer
+        {{- include "image-puller.selectorLabelsExporter" . | nindent 8 }}
+      annotations:	
+        scheduler.alpha.kubernetes.io/critical-pod: ''
+    spec:
+      serviceAccount: {{ include "image-puller.fullname" . | trunc 50 | trimSuffix "-" }}-kube-eventer
+      {{- with .Values.exporter.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}      
+      containers:
+        - image: "{{ .Values.exporter.image.repository }}:{{ .Values.exporter.image.tag }}"
+          name: {{ include "image-puller.fullname" . | trunc 50 | trimSuffix "-" }}-kube-eventer
+          command:
+            - "/kube-eventer"
+            - "--source=kubernetes:https://kubernetes.default"
+            - "--sink=webhook:http://{{.Release.Name}}-webhook-receiver:{{ index .Values "webhook-receiver" "service" "port" }}/hooks/puller?level=Normal&kinds=Pod&reason=Pulled&header=Content-Type=application/json&method=POST"
+            - "--sink=webhook:http://{{.Release.Name}}-webhook-receiver:{{ index .Values "webhook-receiver" "service" "port" }}/hooks/remover?level=Normal&kinds=Pod&reason=Killing&header=Content-Type=application/json&method=POST"
+          {{- with .Values.exporter.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}  
+          {{- end }}    
+      {{- with .Values.exporter.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.exporter.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.exporter.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "image-puller.fullname" . | trunc 50 | trimSuffix "-" }}-kube-eventer
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - events
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "image-puller.fullname" . | trunc 50 | trimSuffix "-" }}-kube-eventer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "image-puller.fullname" . | trunc 50 | trimSuffix "-" }}-kube-eventer
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "image-puller.fullname" . | trunc 50 | trimSuffix "-" }}-kube-eventer
+    namespace: {{.Release.Namespace}}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "image-puller.fullname" . | trunc 50 | trimSuffix "-" }}-kube-eventer

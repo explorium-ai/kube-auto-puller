@@ -1,0 +1,3 @@
+Run the following command to see the ecr credential secret:
+
+    kubectl describe secret {{ .Values.targetPullSecretName }}

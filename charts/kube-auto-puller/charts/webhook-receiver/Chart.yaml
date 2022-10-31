@@ -1,0 +1,18 @@
+apiVersion: v2
+appVersion: 2.8.0
+description: A Helm chart to recieve webhooks, and act accordingly.
+home: https://geek-cookbook.funkypenguin.co.nz
+maintainers:
+- email: thomas@hexf.me
+  name: Thomas Hobson <HexF>
+  url: https://hexf.me/
+- email: davidy@funkypenguin.co.nz
+  name: David Young
+  url: https://www.funkypenguin.co.nz
+name: webhook-receiver
+sources:
+- https://github.com/adnanh/webhook
+- https://hub.docker.com/r/almir/webhook/
+- https://github.com/almir/docker-webhook
+type: application
+version: 1.0.9

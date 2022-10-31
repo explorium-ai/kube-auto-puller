@@ -1,0 +1,92 @@
+{{- if .Values.global.cacheAllOnDeploy.enabled -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "webhook-receiver.fullname" . }}-auto-cacher
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"  
+  labels:
+    {{- include "webhook-receiver.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook-delete-policy: before-hook-creation
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    helm.sh/hook: post-install
+spec:
+  backoffLimit: 2
+  template:
+    metadata:
+      name: {{ include "webhook-receiver.fullname" . }}-auto-cacher
+      labels:
+        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+      labels:
+        {{- include "webhook-receiver.selectorLabelsCacher" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "webhook-receiver.serviceAccountName" . }}
+      restartPolicy: Never
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: kubectl
+        image: "{{ .Values.global.cacheAllOnDeploy.image.repository }}:{{ .Values.global.cacheAllOnDeploy.image.tag }}"
+        imagePullPolicy: {{ .Values.global.cacheAllOnDeploy.image.pullPolicy }}
+        command:
+        - "/bin/bash"
+        - "-c"
+        - |
+          #!/bin/bash
+          relevant_images=$(kubectl get pods -A -o=custom-columns='DATA:spec.containers[*].image' | tr ',' '\n' | awk '!seen[$0]++')
+          relevant_images=${relevant_images#*$'\n'}
+          SAVEIFS=$IFS
+          IFS=$'\n'
+          relevant_images=($relevant_images)
+          IFS=$SAVEIFS
+          echo ${relevant_images[@]}
+          excluded_images=(
+          {{- with .Values.global.exclude }}
+            {{- range . }}
+            {{ . | quote }}
+            {{- end }}
+          {{- end }}  
+          )
+          echo "Excluded Images: ${excluded_images[@]}"
+          for i in "${relevant_images[@]}"
+          do
+          image=$(echo $i)
+          name=$(echo $image | cut -d "/" -f2 | sed "s/[^[:alnum:]-]//g")
+          exclude=false
+          for regex in "${excluded_images[@]}"; do
+            if [[ "$image" =~ $regex ]]; then
+              exclude=true
+              echo "Excluded contains $image"
+            fi
+          done
+          if [ "$exclude" = false ]; then
+          echo "Creating Cache for Image: $image. Name: $name"
+          cat <<EOF | kubectl apply -f -
+          apiVersion: kubefledged.io/v1alpha2
+          kind: ImageCache
+          metadata:
+            name: $(echo -n $name)
+            labels:
+              app: kubefledged
+              kubefledged: imagecache            
+          spec:
+            cacheSpec:
+            - images:
+              - $(echo -n $image)
+            {{- with .Values.global.imageCachePullSecrets }}
+            imagePullSecrets:
+            {{- toYaml . | nindent 14 }}
+            {{- end }}        
+          EOF
+          fi
+          done
+{{- end }}

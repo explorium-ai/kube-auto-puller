@@ -1,0 +1,204 @@
+# Default values for kube-auto-puller.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# -- String to override the default generated name
+nameOverride: ""
+
+# -- String to override the default generated fullname
+fullnameOverride: ""
+
+global:
+  # -- Defines the secrets which will be used to pull images into nodes and cache them
+  imageCachePullSecrets: []
+  
+  # -- # List of images to exclude when creating image caches. works with Regex
+  exclude:
+    - ".*kube-proxy.*"
+  
+  cacheAllOnDeploy: 
+    # -- On Chart install, automatically create all caches for all images in the cluster
+    enabled: true
+    image:
+      # -- The docker image repository to use
+      repository: bitnami/kubectl
+      # -- The docker image tag to use
+      tag: "1.25.3"
+      # -- The docker image pull policy
+      pullPolicy: IfNotPresent
+
+# https://github.com/AliyunContainerService/kube-eventer
+exporter:
+  # -- Image Pull Secrets
+  imagePullSecrets: []
+
+  image:
+    # -- The docker image repository to use
+    repository: registry.aliyuncs.com/acs/kube-eventer-amd64
+    # -- The docker image tag to use
+    tag: v1.2.4-0f5aaee-aliyun
+    # -- The docker image pull policy
+    pullPolicy: IfNotPresent
+
+  # -- Set the resources requests and limits
+  resources:
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    requests:
+      cpu: 100m
+      memory: 100Mi
+    limits:
+      cpu: 500m
+      memory: 250Mi  
+
+  # -- Set the node selector for the pod.
+  nodeSelector: {}
+
+  # -- Set the tolerations for the pod.
+  tolerations: []
+
+  # -- Set the affinity for the pod.
+  affinity: {}
+    
+# https://github.com/senthilrch/kube-fledged/tree/master/deploy/kubefledged-operator/helm-charts/kubefledged
+kube-fledged:
+  args:
+    # -- Time to refresh image caching
+    controllerImageCacheRefreshFrequency: 1m
+  webhookServer:
+    # -- Enabled a webhook server. (WARNING: Enabling breaks the chart. Validating webhook will invalidate certificates)
+    enable: false
+
+# https://github.com/geek-cookbook/helm-webhook-receiver
+webhook-receiver:
+  # -- (int) Numbers of replicas
+  replicaCount: 2
+
+  image:
+    # -- The docker image repository to use
+    repository: weibeld/webhook-kubectl
+    # -- The docker image tag to use
+    tag: 0.0.2
+
+  # -- Image Pull Secrets
+  imagePullSecrets: []
+
+  # -- String to override the default generated name
+  nameOverride: ""
+
+  # -- String to override the default generated fullname
+  fullnameOverride: ""
+
+  serviceAccount:
+    # -- Additional annotations
+    annotations: {}
+    # -- The name of the ServiceAccount to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: webhook-receiver
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    # -- Specifies what type of Service should be created
+    type: ClusterIP
+    # -- Default Service port
+    port: 9000
+
+  ingress:
+    # -- Specifies what type of Ingress should be created
+    enabled: false
+    # -- Additional annotations
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    # -- Ingress host
+    hosts:
+      - host: webhook-receiver.chart.local
+        paths:
+          - /
+    # -- Ingress tls
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  # -- Set the resources requests and limits
+  resources:
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    limits:
+      cpu: 500m
+      memory: 5123Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  # -- Set the node selector for the pod.
+  nodeSelector: {}
+
+  # -- Set the tolerations for the pod.
+  tolerations: []
+
+  # -- Set the affinity for the pod.
+  affinity: {}
+
+  # -- Extra environment variables
+  env: {}
+
+# https://github.com/bhuwanupadhyay/helm-charts/tree/main/charts/ecr-creds
+ecr-creds:
+  # -- Creates an automatic ECR renew sub-chart for creating an ECR authenticating secret in the namespace.
+  enabled: false
+
+  image:
+    # -- The docker image repository to use
+    repository: docker.io/bhuwanupadhyay/ecr-creds
+    # -- The docker image tag to use
+    tag: ""
+    # -- The docker image pull policy
+    pullPolicy: IfNotPresent    
+
+  # -- Image Pull Secrets
+  imagePullSecrets: []
+
+  # -- String to override the default generated name
+  nameOverride: ""
+
+  # -- String to override the default generated fullname
+  fullnameOverride: ""
+
+  serviceAccount:
+    # -- Additional annotations
+    annotations: {}
+    # -- Specifies whether a ServiceAccount should be created
+    create: true
+    # -- The name of the ServiceAccount to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  # -- The name of the ECR creds secret to create. Make use to reference it in the chart.
+  targetPullSecretName: aws-ecr-creds
+  
+  aws:
+    # -- AWS Account ID
+    account: ""
+    # -- AWS Account Region
+    region: ""
+    credentials:
+      # -- (Optional if service account with role exists) AWS Account Access Key
+      accessKey: ""
+      # -- (Optional if service account with role exists) AWS Account Access Key ID
+      secretKey: ""

@@ -1,0 +1,181 @@
+# Default values for webhook-receiver.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: almir/webhook
+  tag: 2.8.0
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: webhook-receiver
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 9000
+
+ingress:
+  enabled: true
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: webhook-receiver.chart.local
+      paths:
+        - /
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Use this to insert env values into the deployment
+env: {}
+
+hooks:
+  # Leave this hook on all the time, disabling it may break everything!
+  status:
+    enable: true
+    files:
+      /data/status.sh: |
+        #!/bin/sh
+        echo Healthy
+    hook:
+      id: status
+      execute-command: /data/status.sh
+      response-message: Online
+      incoming-payload-content-type: text/plain
+  puller:
+    enable: true
+    files:
+      /data/cache.sh: |
+        #!/bin/bash
+        image=$(echo $1 | tr ' ' '\n' | grep ":" | xargs)
+        name=$(echo $image | cut -d "/" -f2 | sed "s/[^[:alnum:]-]//g")
+        excluded_images=(
+        {{- with .Values.global.exclude }}
+          {{- range . }}
+          {{ . | quote }}
+          {{- end }}
+        {{- end }}  
+        )
+        exclude=false
+        for regex in "${excluded_images[@]}"; do
+          if [[ "$image" =~ $regex ]]; then
+            exclude=true
+            echo "Excluded contains $image"
+          fi
+        done
+        if [ "$exclude" = false ]; then
+        echo "Creating Cache for Image: $image. Name: $name"
+        cat <<EOF | kubectl apply -f -
+        apiVersion: kubefledged.io/v1alpha2
+        kind: ImageCache
+        metadata:
+          name: $(echo -n $name)
+          labels:
+            app: kubefledged
+            kubefledged: imagecache            
+        spec:
+          cacheSpec:
+          - images:
+            - $(echo -n $image)
+          {{- with .Values.global.imageCachePullSecrets }}
+          imagePullSecrets:
+          {{- toYaml . | nindent 4 }}
+          {{- end }}    
+        EOF
+        fi
+    hook:
+      id: puller
+      execute-command: /data/cache.sh
+      incoming-payload-content-type: application/json
+      pass-arguments-to-command:
+      - source: payload
+        name: EventMessage
+  remover:
+    enable: true
+    files:
+      /data/delete.sh: |
+        #!/bin/bash
+        hashed_cached_images=$(kubectl get imagecaches -A -o=custom-columns='DATA:metadata.name' | awk '!seen[$0]++')
+        hashed_cached_images=${hashed_cached_images#*$'\n'}
+        relevant_images=$(kubectl get pods -A -o=custom-columns='DATA:spec.containers[*].image' | tr ',' '\n' | awk '!seen[$0]++')
+        relevant_images=${relevant_images#*$'\n'}
+        SAVEIFS=$IFS
+        IFS=$'\n'
+        relevant_images=($relevant_images)
+        hashed_cached_images=($hashed_cached_images)
+        IFS=$SAVEIFS
+        for i in "${!relevant_images[@]}"; do
+          relevant_images[$i]=$(echo ${relevant_images[$i]} | cut -d "/" -f2 | sed "s/[^[:alnum:]-]//g")
+        done
+        echo ${relevant_images[@]}
+        for i in "${hashed_cached_images[@]}"
+        do
+        echo "Checking image $i"
+        if [[ ! " ${relevant_images[*]} " =~ " ${i} " ]]; then
+          image=$(kubectl get imagecaches $i -o=custom-columns='DATA:spec.cacheSpec[0].images[0]')
+          image=${image#*$'\n'}
+          echo $image is no longer in the cluster. purging cache...
+          kubectl annotate --overwrite imagecaches $i kubefledged.io/purge-imagecache=
+          sleep 1
+          status=$(kubectl get imagecaches $i -o json | jq .status.status | xargs)
+          message=$(kubectl get imagecaches $i -o json | jq .status.message | xargs)
+          until [ $status != "Processing" ]
+          do
+              echo Status: $status
+              echo Status: $message
+              status=$(kubectl get imagecaches $i -o json | jq .status.status | xargs)
+              message=$(kubectl get imagecaches $i -o json | jq .status.message)
+              kubectl annotate --overwrite imagecaches $i kubefledged.io/purge-imagecache=
+          done
+          kubectl delete imagecaches $i
+          echo Status: $status
+          echo Message: $message
+        fi
+        done
+    hook:
+      id: remover
+      execute-command: /data/delete.sh
+      incoming-payload-content-type: application/json
+      

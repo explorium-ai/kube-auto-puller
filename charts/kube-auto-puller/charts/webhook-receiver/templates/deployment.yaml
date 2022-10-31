@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "webhook-receiver.fullname" . }}
+  labels:
+    {{- include "webhook-receiver.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "webhook-receiver.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "webhook-receiver.selectorLabels" . | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}            
+    spec:
+      serviceAccountName: {{ include "webhook-receiver.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}      
+      containers:
+        - name: {{ .Chart.Name }}
+          args:
+            - webhook
+            - -verbose
+            - -hooks=/etc/webhook/hooks.yaml
+            - -hotreload
+            - -template
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          {{- range $pkey, $pval := .Values.env }}
+          - name: {{ $pkey }}
+            value: {{ quote $pval }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 9000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /hooks/status
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /hooks/status
+              port: http
+          volumeMounts:
+            - name: configs
+              mountPath: "/etc/webhook/hooks.yaml"
+              subPath: "hooks.yaml"
+          {{- range $key, $hook := .Values.hooks }}
+            {{- range $name, $val := $hook.files }}
+            {{- if $hook.enable }}
+            - name: configs
+              mountPath: {{ $name | replace "%" "." | quote }}
+              subPath: "file_{{ $name | replace "/" "_" | replace "%" "." }}"
+            {{- end }}
+            {{- end }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: configs
+          configMap:
+            name: {{ include "webhook-receiver.fullname" $ }}
+            defaultMode: 0755
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

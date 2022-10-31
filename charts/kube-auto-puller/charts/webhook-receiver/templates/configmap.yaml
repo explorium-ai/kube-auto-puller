@@ -1,0 +1,18 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ include "webhook-receiver.fullname" . }}
+  labels:
+    {{- include "webhook-receiver.labels" . | nindent 4 }}
+data:
+  hooks.yaml: | {{- range $key, $val := .Values.hooks }}
+    - {{ $val.hook | toYaml | indent 6 | trim }}
+  {{- end }}
+  {{- range $key, $hook := .Values.hooks }}
+    {{- range $name, $val := $hook.files }}
+      {{- if $hook.enable }}
+  file_{{ $name | replace "/" "_" | replace "%" "." }}: |
+{{ tpl $val $ | indent 8 }}
+      {{- end }}
+    {{- end }}
+  {{- end }}

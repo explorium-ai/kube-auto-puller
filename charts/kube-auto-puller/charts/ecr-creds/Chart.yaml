@@ -1,0 +1,26 @@
+apiVersion: v2
+icon: https://bhuwanupadhyay.github.io/img/profile.jpeg
+name: ecr-creds
+description: A Helm chart for Kubernetes with AWS ECR
+type: application
+
+# This is the chart version. This version number should be incremented each time you make changes
+# to the chart and its templates, including the app version.
+# Versions are expected to follow Semantic Versioning (https://semver.org/)
+version: 0.0.1
+
+# This is the version number of the application being deployed. This version number should be
+# incremented each time you make changes to the application. Versions are not expected to
+# follow Semantic Versioning. They should reflect the version the application is using.
+appVersion: 1.0.0
+
+maintainers:
+  - name: bhuwanupadhyay
+    email: er.bhuwan.upadhyay@gmail.com
+    url: https://bhuwanupadhyay.github.io/cv/
+keywords:
+  - aws ecr
+  - imagePullSecrets
+  - kubernetes
+sources:
+  - https://github.com/bhuwanupadhyay/helm-charts/tree/master/charts/ecr-creds

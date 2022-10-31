@@ -1,0 +1,5 @@
+# ID is for the OCI Image
+repositoryID: ""
+owners:
+  - name: Explorium AI
+    email: devops@explorium.ai
