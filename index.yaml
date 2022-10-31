@@ -5,6 +5,41 @@ entries:
       category: Kubernetes
     apiVersion: v2
     appVersion: "1.0"
+    created: "2022-10-31T15:50:41.476230824Z"
+    dependencies:
+    - name: kube-fledged
+      repository: https://senthilrch.github.io/kubefledged-charts/
+      version: v0.10.0
+    - name: webhook-receiver
+      repository: ""
+      version: 1.0.9
+    - condition: ecr-creds.enabled
+      name: ecr-creds
+      repository: ""
+      version: 0.0.1
+    description: A Kubernetes Image Puller and Cacher with Automatic Discovery
+    digest: e766fbcf8bcb019109adca2c9f0933b1124cbe8c2e9aa61ce8b6c657ad1aa617
+    home: https://github.com/explorium-ai/kube-auto-puller
+    keywords:
+    - kube-fledged
+    - image
+    - kubernetes
+    - cache
+    - pull
+    maintainers:
+    - email: devops@explorium.ai
+      name: explorium-ai
+      url: https://www.explorium.ai/
+    name: kube-auto-puller
+    sources:
+    - https://github.com/explorium-ai/kube-auto-puller
+    urls:
+    - https://github.com/explorium-ai/kube-auto-puller/releases/download/1.0.1-helm/kube-auto-puller-1.0.1.tgz
+    version: 1.0.1
+  - annotations:
+      category: Kubernetes
+    apiVersion: v2
+    appVersion: "1.0"
     created: "2022-10-31T11:55:36.009904354Z"
     dependencies:
     - name: kube-fledged
@@ -26,4 +61,4 @@ entries:
     urls:
     - https://github.com/explorium-ai/kube-auto-puller/releases/download/1.0.0-helm/kube-auto-puller-1.0.0.tgz
     version: 1.0.0
-generated: "2022-10-31T11:55:36.009914954Z"
+generated: "2022-10-31T15:50:41.476243724Z"
