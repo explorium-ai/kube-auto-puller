@@ -5,6 +5,7 @@ remote: origin
 target-branch: main
 chart-dirs:
   - charts
+  - charts/kube-auto-puller/charts
 helm-extra-args: "--timeout 600s"
 validate-chart-schema: true
 validate-chart-values: true

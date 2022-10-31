@@ -48,8 +48,6 @@ jobs:
       - name: List changed charts
         id: list-changed
         run: |
-          ls -l charts/kube-auto-puller
-          ls -l charts/kube-auto-puller/charts
           ## If executed with debug this won't work anymore.
           changed=$(ct --config ./.github/configs/ct-lint.yaml list-changed)
           charts=$(echo "$changed" | tr '\n' ' ' | xargs)
@@ -65,7 +63,7 @@ jobs:
           rm -f ./ah
 
       - name: Run chart-testing (lint)
-        run: ct lint --debug --config ./.github/configs/ct-lint.yaml --lint-conf ./.github/configs/lintconf.yaml
+        run: ct lint --debug --config ./.github/configs/ct-lint.yaml --lint-conf ./.github/configs/lintconf.yaml --skip-refresh
 
       - name: Create kind cluster
         uses: helm/kind-action@9e8295d178de23cbfbd8fa16cf844eec1d773a07 # tag=v1.4.0
