@@ -18,11 +18,11 @@ A Kubernetes Image Puller and Cacher with Automatic Discovery
    
     # -- # List of images to exclude when creating image caches. works with Regex
     exclude:
-        - ".*kube-proxy.*"
+      - ".*kube-proxy.*"
    
     cacheAllOnDeploy:
-        # -- On Chart install, automatically create all caches for all images in the cluster (respecting excluded list)
-        enabled: true
+      # -- On Chart install, automatically create all caches for all images in the cluster (respecting excluded list)
+      enabled: true
     ```
 - Install latest version of kube-auto-puller helm chart
 
