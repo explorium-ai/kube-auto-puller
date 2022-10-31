@@ -70,7 +70,7 @@ jobs:
         if: steps.list-changed.outputs.changed == 'true'
 
       - name: Repo Add
-        run: helm repo add https://senthilrch.github.io/kubefledged-charts/
+        run: helm repo add kube-fledged https://senthilrch.github.io/kubefledged-charts/
 
       - name: Run chart-testing (install)
         run: ct install --config ./.github/configs/ct-lint.yaml
