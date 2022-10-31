@@ -9,7 +9,7 @@
 A Kubernetes Image Puller and Cacher with Automatic Discovery
 
 ## Usage
-<fill out>
+WIP
 
 ## Values
 
