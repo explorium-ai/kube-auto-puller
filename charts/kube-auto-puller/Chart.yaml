@@ -27,4 +27,4 @@ dependencies:
     version: 0.0.1
     condition: ecr-creds.enabled
 name: kube-auto-puller
-version: 1.0.0
+version: 1.0.1
