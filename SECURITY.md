@@ -14,7 +14,7 @@ The `kube-auto-puller` team and community take all security bugs in `kube-auto-p
 seriously. Thank you for improving the security of `kube-auto-puller`. We appreciate your efforts and
 responsible disclosure and will make every effort to acknowledge your contributions.
 
-Report security bugs by emailing the lead maintainer at engin.diri@ediri.de.
+Report security bugs by emailing the lead maintainer at devops@explorium.ai.
 
 The lead maintainer will acknowledge your email within 48 hours, and will send a more detailed response within 48 hours
 indicating the next steps in handling your report. After the initial reply to your report, the security team will
