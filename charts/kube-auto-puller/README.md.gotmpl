@@ -20,6 +20,10 @@
       exclude:
         - ".*kube-proxy.*"
       
+      # --  # List of images to include when creating image caches. works with Regex.
+      include:
+        - ".*"
+
       cacheAllOnDeploy: 
         # -- On Chart install, automatically create all caches for all images in the cluster (respecting excluded list)
         enabled: true
