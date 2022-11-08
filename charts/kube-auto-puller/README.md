@@ -1,6 +1,6 @@
 # Kube-Auto-Puller
 
-![Version: 1.0.2](https://img.shields.io/badge/Version-1.0.2-informational?style=for-the-badge)
+![Version: 1.1.2](https://img.shields.io/badge/Version-1.1.2-informational?style=for-the-badge)
 
 ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=for-the-badge)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/kube-auto-puller)](https://artifacthub.io/packages/search?repo=kube-auto-puller)
@@ -20,6 +20,10 @@ A Kubernetes Image Puller and Cacher with Automatic Discovery
       exclude:
         - ".*kube-proxy.*"
      
+      # --  # List of images to include when creating image caches. works with Regex.
+      include:
+        - ".*"
+
       cacheAllOnDeploy:
         # -- On Chart install, automatically create all caches for all images in the cluster (respecting excluded list)
         enabled: true
@@ -66,6 +70,7 @@ A Kubernetes Image Puller and Cacher with Automatic Discovery
 | global.cacheAllOnDeploy.image.tag | string | `"1.25.3"` | The docker image tag to use |
 | global.exclude | list | `[".*kube-proxy.*"]` | # List of images to exclude when creating image caches. works with Regex |
 | global.imageCachePullSecrets | list | `[]` | Defines the secrets which will be used to pull images into nodes and cache them |
+| global.include | list | `[".*"]` | # List of images to include when creating image caches. works with Regex. |
 | kube-fledged.args.controllerImageCacheRefreshFrequency | string | `"1m"` | Time to refresh image caching |
 | kube-fledged.webhookServer.enable | bool | `false` | Enabled a webhook server. (WARNING: Enabling breaks the chart. Validating webhook will invalidate certificates) |
 | nameOverride | string | `""` | String to override the default generated name |
