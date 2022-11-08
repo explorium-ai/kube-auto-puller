@@ -1,6 +1,6 @@
 # Kube-Auto-Puller
 
-![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=for-the-badge)
+![Version: 1.0.2](https://img.shields.io/badge/Version-1.0.2-informational?style=for-the-badge)
 
 ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=for-the-badge)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/kube-auto-puller)](https://artifacthub.io/packages/search?repo=kube-auto-puller)
@@ -13,16 +13,16 @@ A Kubernetes Image Puller and Cacher with Automatic Discovery
 - Configure general values
     ```yaml
     global:
-    # -- Defines the secrets which will be used to pull images into nodes and cache them
-    imageCachePullSecrets: []
-   
-    # -- # List of images to exclude when creating image caches. works with Regex
-    exclude:
-      - ".*kube-proxy.*"
-   
-    cacheAllOnDeploy:
-      # -- On Chart install, automatically create all caches for all images in the cluster (respecting excluded list)
-      enabled: true
+      # -- Defines the secrets which will be used to pull images into nodes and cache them
+      imageCachePullSecrets: []
+     
+      # -- # List of images to exclude when creating image caches. works with Regex
+      exclude:
+        - ".*kube-proxy.*"
+     
+      cacheAllOnDeploy:
+        # -- On Chart install, automatically create all caches for all images in the cluster (respecting excluded list)
+        enabled: true
     ```
 - Install latest version of kube-auto-puller helm chart
 

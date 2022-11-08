@@ -106,7 +106,7 @@ hooks:
         )
         exclude=false
         for regex in "${excluded_images[@]}"; do
-          if [[ "$image" =~ $regex ]]; then
+          if echo $image | grep -q -x -e $regex; then
             exclude=true
             echo "Excluded contains $image"
           fi
