@@ -67,7 +67,12 @@ spec:
             {{ . | quote }}
             {{- end }}
           {{- end }}
-          )        
+          )  
+          echo "Excluded Images: ${excluded_images[@]}"
+          for i in "${relevant_images[@]}"
+          do
+          image=$(echo $i)
+          name=$(echo $image | cut -d "/" -f2 | sed "s/[^[:alnum:]-]//g")
           exclude=false
           for regex in "${excluded_images[@]}"; do
             if echo $image | grep -q -x -e "$regex"; then
